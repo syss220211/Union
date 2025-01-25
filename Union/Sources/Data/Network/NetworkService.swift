@@ -63,13 +63,23 @@ extension NetworkService {
                 throw NetworkError.queryParameterError
             }
             
-            var queryItems: [URLQueryItem] = []
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+            if components == nil {
+                throw NetworkError.invalidURL
+            }
+
+            var queryItems: [URLQueryItem] = components?.queryItems ?? []
             
-            queryDictionary.forEach({ key, value in
+            queryDictionary.forEach { key, value in
                 queryItems.append(URLQueryItem(name: key, value: "\(value)"))
-            })
+            }
             
-            url.append(queryItems: queryItems)
+            components?.queryItems = queryItems
+            
+            guard let updatedURL = components?.url else {
+                throw NetworkError.invalidURL
+            }
+            url = updatedURL
         }
         
         /// URLRequest 생성

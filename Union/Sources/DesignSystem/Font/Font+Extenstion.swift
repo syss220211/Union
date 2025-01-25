@@ -69,7 +69,7 @@ struct UfontModifier: ViewModifier {
         content
             .padding(.vertical, (lineHeight - size / 2))
             .font(.custom(font.font, size: size))
-            .tracking(font.letter)
+//            .tracking(font.letter)
             .foregroundStyle(color)
     }
 }
