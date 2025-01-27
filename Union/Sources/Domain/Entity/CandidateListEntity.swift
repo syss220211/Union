@@ -27,6 +27,7 @@ struct CandidateContentEntity: Decodable {
     let name: String
     let profileUrl: String
     let voteCnt: String
+    var voted: Bool = false
 }
 
 struct SortEntity: Decodable {
@@ -42,4 +43,22 @@ struct PageableEntity: Decodable {
     let pageSize: Int
     let paged: Bool
     let unpaged: Bool
+}
+
+extension CandidateListEntity {
+    func updatingContent(with newContent: [CandidateContentEntity]) -> CandidateListEntity {
+        return CandidateListEntity(
+            totalPages: self.totalPages,
+            totalElements: self.totalElements,
+            size: self.size,
+            content: newContent,
+            number: self.number,
+            sort: self.sort,
+            pageable: self.pageable,
+            numberOfElements: self.numberOfElements,
+            first: self.first,
+            last: self.last,
+            empty: self.empty
+        )
+    }
 }

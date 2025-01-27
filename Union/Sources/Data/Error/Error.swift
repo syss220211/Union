@@ -38,3 +38,49 @@ enum NetworkError: Error {
     /// Mapper Error
     case badMapper
 }
+
+
+enum StatusCode: Int, CaseIterable {
+    ///You have exceeded the maximum number of allowed votes.
+    case code400 = 400
+    /// This candidate is not exist.
+    case code401 = 401
+    /// This candidate is not exist.
+    case code404 = 404
+    /// You already voted.
+    case code409 = 409
+    
+    var code: Int {
+        switch self {
+        case .code400:
+            return 400
+        case .code401:
+            return 401
+        case .code404:
+            return 404
+        case .code409:
+            return 409
+        }
+    }
+    
+    var message: String {
+        switch self {
+        case .code400:
+            return "허용된 최대 투표 수를 초과할 수 없습니다."
+        case .code401:
+            return "해당 후보자는 존재하지 않습니다."
+        case .code404:
+            return "해당 후보자는 존재하지 않습니다."
+        case .code409:
+            return "이미 투표한 후보자입니다."
+        }
+    }
+    
+    /// 숫자 상태 코드를 기반으로 메시지를 반환하는 메서드
+    static func message(forCode code: Int) -> String? {
+        guard let statusCode = StatusCode(rawValue: code) else {
+            return nil /// 유효한 상태 코드가 아닐 경우 nil 반환
+        }
+        return statusCode.message
+    }
+}

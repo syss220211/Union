@@ -25,5 +25,6 @@ extension Color {
     static let gray3C3C43: Color = Color("3C3C43")
     static let gray060203: Color = Color("060203")
     static let grayF6F6F6: Color = Color("F6F6F6")
-    
+    static let grayB9B9B9: Color = Color("B9B9B9")
+    static let grayDADADA: Color = Color("DADADA")
 }
