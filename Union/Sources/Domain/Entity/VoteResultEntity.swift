@@ -8,7 +8,6 @@
 import Foundation
 
 struct VoteResultEntity {
-    let errorCode: Int
+    let errorCode: String
     let errorMessage: String
 }
-

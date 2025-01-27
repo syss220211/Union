@@ -11,19 +11,19 @@ import Combine
 struct VoteUsecase {
     let voteRepoProtocol: VoteRepositoryProtocol
     
-//    func getCandidateDetailInfo() -> AnyPublisher<CandidateDetailDTO, NetworkError> {
-//        return voteRepoProtocol.getCandidateDetailInfo()
-//    }
-//    
-//    func getCandidateList() -> AnyPublisher<CandidateListDTO, NetworkError> {
-//        return voteRepoProtocol.getCandidateList()
-//    }
-//    
+    func getCandidateDetailInfo(candidateID: Int, voterID: String) -> AnyPublisher<CandidateDetailEntity, NetworkError> {
+        return voteRepoProtocol.getCandidateDetailInfo(candidateID: candidateID, voterID: voterID)
+    }
+    
+    func getCandidateList(pageable: PageableRequest, searchKeyworkd: String) -> AnyPublisher<CandidateListEntity, NetworkError> {
+        return voteRepoProtocol.getCandidateList(pageable: pageable, searchKeyworkd: searchKeyworkd)
+    }
+    
     func getVotedCadidateList(userId: String) -> AnyPublisher<VotedCandidateListEntity, NetworkError> {
         return voteRepoProtocol.getVotedCadidateList(userId: userId)
     }
-//    
-//    func postVote(candidate: CandidateRequest) -> AnyPublisher<VoteResultDTO, NetworkError> {
-//        return voteRepoProtocol.postVote(candidate: candidate)
-//    }
+    
+    func postVote(candidate: VoteRequest) -> AnyPublisher<Data, NetworkError> {
+        return voteRepoProtocol.postVote(candidate: candidate)
+    }
 }

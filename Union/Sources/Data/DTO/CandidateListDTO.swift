@@ -26,7 +26,7 @@ struct CandidateContentDTO: Decodable {
     let candidateNumber: Int?
     let name: String?
     let profileUrl: String?
-    let voteCnt: Int?
+    let voteCnt: String?
 }
 
 struct SortDTO: Decodable {

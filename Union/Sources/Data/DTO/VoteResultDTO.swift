@@ -8,6 +8,11 @@
 import Foundation
 
 struct VoteResultDTO: Decodable {
-    let errorCode: Int?
+    let errorCode: String?
     let errorMessage: String?
+    
+    private enum CodingKeys: String, CodingKey {
+        case errorCode
+        case errorMessage
+    }
 }

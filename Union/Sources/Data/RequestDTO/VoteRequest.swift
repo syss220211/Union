@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CandidateRequest: Encodable {
+struct VoteRequest: Encodable {
     let userId: String
     let id: Int
 }
