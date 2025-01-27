@@ -7,8 +7,9 @@
 
 import Foundation
 
-struct PageableRequest {
+struct PageableRequestDTO: Encodable {
     let page: Int
     let size: Int
     let sort: [String]
+    let searchKeyword: String?
 }

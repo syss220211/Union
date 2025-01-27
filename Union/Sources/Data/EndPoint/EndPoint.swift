@@ -13,7 +13,7 @@ struct BaseUrl {
 
 enum EndPoint: String {
     case getCandidateList = "/vote/candidate/list"
-    case getCandidateDetail = "/vote/candiate"
+    case getCandidateDetail = "/vote/candidate"
     case votedCandidateList = "/vote/voted/candidate/list"
     case vote = "/vote"
     

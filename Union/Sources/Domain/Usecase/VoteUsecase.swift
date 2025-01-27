@@ -11,19 +11,24 @@ import Combine
 struct VoteUsecase {
     let voteRepoProtocol: VoteRepositoryProtocol
     
-    func getCandidateDetailInfo(candidateID: Int, voterID: String) -> AnyPublisher<CandidateDetailEntity, NetworkError> {
-        return voteRepoProtocol.getCandidateDetailInfo(candidateID: candidateID, voterID: voterID)
+    /// 후보자 상세정보 조회
+    func getCandidateDetailInfo(request: VoteType) -> AnyPublisher<CandidateDetailEntity, NetworkError> {
+        return voteRepoProtocol.getCandidateDetailInfo(request: request)
     }
     
-    func getCandidateList(pageable: PageableRequest, searchKeyworkd: String) -> AnyPublisher<CandidateListEntity, NetworkError> {
-        return voteRepoProtocol.getCandidateList(pageable: pageable, searchKeyworkd: searchKeyworkd)
+    /// 후보자 목록 조회
+    func getCandidateList(request: VoteType) -> AnyPublisher<CandidateListEntity, NetworkError> {
+        return voteRepoProtocol.getCandidateList(request: request)
     }
     
-    func getVotedCadidateList(userId: String) -> AnyPublisher<VotedCandidateListEntity, NetworkError> {
-        return voteRepoProtocol.getVotedCadidateList(userId: userId)
+    /// 유저가 투표한 후보자 목록 조회
+    func getVotedCadidateList(request: VoteType) -> AnyPublisher<VotedCandidateListEntity, NetworkError> {
+        return voteRepoProtocol.getVotedCadidateList(request: request)
     }
     
-    func postVote(candidate: VoteRequest) -> AnyPublisher<Data, NetworkError> {
-        return voteRepoProtocol.postVote(candidate: candidate)
+    /// 투표 실행
+    func postVote(request: VoteType) -> AnyPublisher<Data, NetworkError> {
+        return voteRepoProtocol.postVote(request: request)
     }
+    
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VoteRequest: Encodable {
+struct VoteRequestDTO: Encodable {
     let userId: String
     let id: Int
 }
