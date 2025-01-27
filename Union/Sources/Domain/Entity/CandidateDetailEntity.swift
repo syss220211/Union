@@ -24,8 +24,21 @@ struct CandidateDetailEntity {
 }
 
 struct ProfileInfoListEntity {
+    let id = UUID().uuidString
     let fileArea: Int
     let displayOrder: Int
     let profileUrl: String
     let mimeType: String
+}
+
+extension CandidateDetailEntity {
+    var details: [(title: String, content: String)] {
+        [
+            ("Education", education),
+            ("Major", major),
+            ("Hobby", hobby),
+            ("Talent", talent),
+            ("Ambition", ambition)
+        ]
+    }
 }

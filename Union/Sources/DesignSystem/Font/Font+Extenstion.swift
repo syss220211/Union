@@ -67,7 +67,7 @@ struct UfontModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .padding(.vertical, (lineHeight - size / 2))
+            .padding(.vertical, ((lineHeight - size) / 2))
             .font(.custom(font.font, size: size))
 //            .tracking(font.letter)
             .foregroundStyle(color)
