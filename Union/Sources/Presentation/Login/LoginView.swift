@@ -7,8 +7,13 @@
 
 import SwiftUI
 
+class LoginViewModel: ObservableObject {
+    @Published var text: String = ""
+}
+
 struct LoginView: View {
-    @State var text: String = ""
+    @StateObject var viewModel = LoginViewModel()
+    @EnvironmentObject var router: Router
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -24,11 +29,12 @@ struct LoginView: View {
 
                     Spacer().frame(height: 32)
                     VStack(spacing: 24) {
-                        UTextField(text: $text)
+                        UTextField(text: $viewModel.text)
                         
                         UBottomButton(title: "Log in", type: .large(false))
                             .tap {
-                                // 네비게이션
+                                print("go to candidateListView")
+                                router.navigateTo(.votingView)
                             }
                     }
                     .padding(.horizontal, 16)
@@ -48,4 +54,5 @@ struct LoginView: View {
 
 #Preview {
     LoginView()
+        .environmentObject(Router())
 }

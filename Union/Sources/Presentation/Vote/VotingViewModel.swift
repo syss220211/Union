@@ -16,6 +16,7 @@ class VotingViewModel: ObservableObject {
     @Published var statusCode: Int?
     @Published var errorMessage: String = ""
     @Published var voteFlag: Bool = false
+    @Published var popupSuccessFlag: Bool = false
     @Published var toastMessageFailFlag: Bool = false
     @Published var toastMessageSuccessFlag: Bool = false
     @Published var tappedCandidateID: Int?
@@ -91,13 +92,15 @@ class VotingViewModel: ObservableObject {
                     .store(in: &cancellables)
                 
             case .postVote(let candidateID):
-                let voteRequest: VoteRequestDTO = VoteRequestDTO(userId: "userA", id: candidateID)
+                let voteRequest: VoteRequestDTO = VoteRequestDTO(userId: "userABddD", id: candidateID)
                 let request: VoteType = .postVote(candidate: voteRequest)
                 usecase.postVote(request: request)
                     .receive(on: DispatchQueue.main)
                     .sink { completion in
                         switch completion {
                         case .finished:
+                            self.errorMessage = "투표가 완료되었습니다."
+                            self.toastMessageSuccessFlag = true
                             print("finised")
                             break
                         case .failure(let error):
@@ -118,6 +121,7 @@ class VotingViewModel: ObservableObject {
                             self?.voteFlag = true
                             print("투표에 성공하였습니다.")
                         }
+                        print("entity.... \(entity)")
                     }
                     .store(in: &cancellables)
                 

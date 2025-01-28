@@ -63,7 +63,7 @@ extension View {
     ///   - isPresented: 팝업 표시 여부를 제어하는 Binding
     ///   - content: 팝업 알림 내용을 구성하는 클로저
     /// - Returns: 팝업이 추가된 View
-    func uPopUp(isPresented: Binding<Bool>, content: @escaping () -> UPopupView) -> some View {
+    func UPopUp(isPresented: Binding<Bool>, content: @escaping () -> UPopupView) -> some View {
         self.modifier(UPopupModifier(isPresented: isPresented, newContent: content))
     }
 }

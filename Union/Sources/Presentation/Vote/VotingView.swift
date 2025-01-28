@@ -9,7 +9,7 @@ import SwiftUI
 
 struct VotingView: View {
     @StateObject var viewModel = VotingViewModel()
-
+    @StateObject private var timer = CountdownTimer()
     var body: some View {
         ZStack {
             ScrollView {
@@ -41,6 +41,7 @@ struct VotingView: View {
             .UToast($viewModel.toastMessageSuccessFlag, .success, viewModel.errorMessage)
             .ignoresSafeArea(edges: .bottom)
         }
+        .navigationBarBackButtonHidden()
     }
 }
 
@@ -57,16 +58,16 @@ extension VotingView {
             .scaledToFit()
             .overlay(alignment: .bottom) {
                 HStack {
-                    ForEach(Time.allCases, id: \.self) { value in
+                    ForEach(Time.allCases, id: \.self) { time in
                         VStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color.white.opacity(0.12))
                                 .frame(width: 48,height: 48)
                                 .overlay {
-                                    Text("10")
+                                    Text("\(time.value(from: timer.timeComponents))")
                                         .utypograph(font: .meduim, size: 22, lineHeight: 12, color: .grayDBDBDB)
                                 }
-                            Text(value.rawValue)
+                            Text(time.rawValue)
                                 .utypograph(font: .meduim, size: 10, lineHeight: 12, color: .grayDADADA)
                         }
                         .padding(.bottom, 55)
@@ -134,13 +135,6 @@ extension VotingView {
                 }
                 .padding(.horizontal, 14)
             }
-    }
-    
-    private enum Time: String, CaseIterable {
-        case day = "DAY"
-        case hr = "HR"
-        case min = "MIN"
-        case sec = "SEC"
     }
 }
 
