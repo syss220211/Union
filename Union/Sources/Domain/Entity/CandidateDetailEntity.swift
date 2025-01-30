@@ -20,7 +20,7 @@ struct CandidateDetailEntity {
     let contents: String
     let profileInfoList: [ProfileInfoListEntity]
     let regDt: String
-    let voted: Bool
+    var voted: Bool
 }
 
 struct ProfileInfoListEntity {

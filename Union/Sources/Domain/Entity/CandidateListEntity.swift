@@ -11,7 +11,7 @@ struct CandidateListEntity {
     let totalPages: Int
     let totalElements: Int
     let size: Int
-    let content: [CandidateContentEntity]
+    var content: [CandidateContentEntity]
     let number: Int
     let sort: SortEntity
     let pageable: PageableEntity
@@ -21,7 +21,7 @@ struct CandidateListEntity {
     let empty: Bool
 }
 
-struct CandidateContentEntity: Decodable {
+struct CandidateContentEntity {
     let id: Int
     let candidateNumber: Int
     let name: String
@@ -30,13 +30,13 @@ struct CandidateContentEntity: Decodable {
     var voted: Bool = false
 }
 
-struct SortEntity: Decodable {
+struct SortEntity {
     let empty: Bool
     let sorted: Bool
     let unsorted: Bool
 }
 
-struct PageableEntity: Decodable {
+struct PageableEntity {
     let offset: Int
     let sort: SortEntity
     let pageNumber: Int

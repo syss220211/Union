@@ -22,55 +22,68 @@ struct CandidateListView: View {
             Header()
             
             LazyVGrid(columns: columns, spacing: 40) {
-                ForEach(viewModel.candidateList?.content ?? [], id: \.id) { data in
-                    VStack(spacing: 18) {
-                        NavigationLink {
-                            CandidateDetailView(
-                                votingViewModel: viewModel,
-                                viewModel: CandidateDetailViewModel(
-                                    userID: viewModel.userID,
-                                    candidateID: data.id
+                if let candidateList = viewModel.candidateList {
+                    ForEach(candidateList.content, id: \.id) { data in
+                        VStack(spacing: 18) {
+                            NavigationLink {
+                                CandidateDetailView(votingViewModel: viewModel, userID: viewModel.userID, candidateID: data.id)
+                            } label: {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(.clear)
+                                    .frame(width: size, height: size)
+                                    .overlay {
+                                        KFImage(URL(string: data.profileUrl))
+                                            .placeholder {
+                                                ProgressView()
+                                                    .tint(Color.blue4232D5)
+                                            }
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: size, height: size)
+                                    }
+                            }
+                            
+                            VStack(spacing: 4){
+                                Text(data.name)
+                                    .utypograph(font: .meduim, size: 16, lineHeight: 12, color: .grayF6F6F6)
+                                
+                                Text("\(data.voteCnt) voted")
+                                    .utypograph(font: .meduim, size: 14, lineHeight: 16, color: .blue6F76FF)
+                                    .padding(.bottom, 6)
+                                
+                                UBottomButton(
+                                    title: data.voted
+                                    ? "voted" : "vote",
+                                    type: .medium(data.voted)
                                 )
-                            )
-                        } label: {
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(.clear)
-                                .frame(width: size, height: size)
-                                .overlay {
-                                    KFImage(URL(string: data.profileUrl))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: size, height: size)
+                                .tap {
+                                    guard let _ = viewModel.candidateList else { return }
+                                    viewModel.votedButtonFlag.toggle()
+                                    viewModel.action(.postVote(candidateID: data.id, type: .main))
                                 }
-                        }
-                        
-                        VStack(spacing: 4){
-                            Text(data.name)
-                                .utypograph(font: .meduim, size: 16, lineHeight: 12, color: .grayF6F6F6)
-                            
-                            Text("\(data.voteCnt) voted")
-                                .utypograph(font: .meduim, size: 14, lineHeight: 16, color: .blue6F76FF)
-                                .padding(.bottom, 6)
-                            
-                            UBottomButton(
-                                title: data.voted
-                                ? "voted" : "vote",
-                                type: .medium(data.voted)
-                            )
-                            .tap {
-                                viewModel.action(.postVote(candidateID: data.id))
-                                viewModel.votedButtonFlag.toggle()
                             }
                         }
                     }
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                    } else if viewModel.hasMoreProducts {
+                        Color.clear
+                            .onAppear {
+                                viewModel.action(.getCandidateList)
+                                viewModel.action(.votedCandidateList)
+                                viewModel.action(.getVotedCandidateListUser)
+                            }
+                    }
+                    
+                } else {
+                    ProgressView()
+                        .tint(Color.blue4232D5)
                 }
+                
+                
             }
             .padding(.horizontal, 19)
-        }
-        .onAppear {
-            viewModel.action(.getCandidateList)
-            viewModel.action(.votedCandidateList)
-            viewModel.action(.getVotedCandidateListUser)
         }
         .onChange(of: viewModel.votedButtonFlag) { _ in
             viewModel.action(.getCandidateList)

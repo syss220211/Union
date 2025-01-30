@@ -13,26 +13,16 @@ class CandidateDetailViewModel: ObservableObject {
     @Published var candidateDetail: CandidateDetailEntity?
     @Published var imageList: [ProfileInfoListEntity] = []
     @Published var currentProfileIndex = 0
-
-    let userID: String
-    let candidateID: Int
+    @Published var userID: String = ""
+    @Published var candidateID: Int = 0
+    
     private var cancellables = Set<AnyCancellable>()
     private let usecase = VoteUsecase(voteRepoProtocol: VoteRepository())
     
     enum Action {
         case getCandidateDetailInfo
-        case tappedBackButton
-        case tappedCloseButton
         case startTimer
         case stopTimer
-    }
-    
-    init(
-        userID: String,
-        candidateID: Int
-    ) {
-        self.userID = userID
-        self.candidateID = candidateID
     }
     
     func action(_ action: Action) {
@@ -53,12 +43,6 @@ class CandidateDetailViewModel: ObservableObject {
                     self?.imageList = entity.profileInfoList
                 }
                 .store(in: &cancellables)
-            
-        case .tappedBackButton:
-            print("tappedBackButton")
-            
-        case .tappedCloseButton:
-            print("tappedCloseButton")
             
         case .startTimer:
             timer = Timer.publish(every: 3.0, on: .main, in: .common).autoconnect()

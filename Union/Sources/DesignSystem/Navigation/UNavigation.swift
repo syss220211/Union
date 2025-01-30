@@ -55,13 +55,13 @@ struct UNavigation: View {
         switch type {
         case .RButtontitle:
             EmptyView()
-        case .LRBUttonTitle(_, _, let rightImage):
-            Image(rightImage)
+        case .LRBUttonTitle(_, let leftImage, _):
+            Image(leftImage)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)
                 .onTapGesture {
-                    rightAction?()
+                    leftAction?()
                 }
         }
     }
@@ -75,7 +75,7 @@ struct UNavigation: View {
                 .scaledToFit()
                 .frame(width: 24, height: 24)
                 .onTapGesture {
-                    leftAction?()
+                    rightAction?()
                 }
         case .LRBUttonTitle(_, _,let rightImage):
             Image(rightImage)

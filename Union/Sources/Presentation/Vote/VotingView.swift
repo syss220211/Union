@@ -10,6 +10,7 @@ import SwiftUI
 struct VotingView: View {
     @ObservedObject var viewModel: VotingViewModel
     @StateObject private var timer = CountdownTimer()
+    @EnvironmentObject var router: Router
     
     var body: some View {
         ZStack {
@@ -36,13 +37,18 @@ struct VotingView: View {
                 .ignoresSafeArea(edges: .bottom)
             }
             .onChange(of: viewModel.errorMessage) { _ in
-                viewModel.toastMessageFailFlag = true
+                viewModel.votingToastFail = true
             }
-            .UToast($viewModel.toastMessageFailFlag, .fail, viewModel.errorMessage)
-            .UToast($viewModel.toastMessageSuccessFlag, .success, viewModel.errorMessage)
+            .UToast($viewModel.votingToastFail, .fail, viewModel.errorMessage)
+            .UToast($viewModel.votingToastSuccess, .success, viewModel.errorMessage)
             .ignoresSafeArea(edges: .bottom)
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            viewModel.action(.getCandidateList)
+            viewModel.action(.votedCandidateList)
+            viewModel.action(.getVotedCandidateListUser)
+        }
     }
 }
 
@@ -50,6 +56,9 @@ extension VotingView {
     @ViewBuilder
     func Header() -> some View {
         UNavigation(type: .RButtontitle(title: "2024 WMU", leftImage: .icCloseLine))
+            .rightTap {
+                router.navigateBack()
+            }
     }
     
     @ViewBuilder

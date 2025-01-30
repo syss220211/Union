@@ -11,32 +11,44 @@ import Kingfisher
 
 struct CandidateDetailView: View {
     @ObservedObject var votingViewModel: VotingViewModel
-    @ObservedObject var viewModel: CandidateDetailViewModel
+    @StateObject var viewModel: CandidateDetailViewModel = CandidateDetailViewModel()
+    @EnvironmentObject var router: Router
+    @Environment(\.dismiss) var dismiss
+    
+    let userID: String
+    let candidateID: Int
+    
+    init(
+        votingViewModel: VotingViewModel,
+        userID: String,
+        candidateID: Int
+    ) {
+        self.votingViewModel = votingViewModel
+        self.userID = userID
+        self.candidateID = candidateID
+    }
     
     var body: some View {
         ZStack {
             ScrollView {
-                VStack(spacing: 0) {
-                    UNavigation(
-                        type: .LRBUttonTitle(
-                            title: "2024 WMU",
-                            leftImage: .icArrowLeft,
-                            rightImage: .icCloseLine
-                        )
-                    )
-                    
-                    candidateImage()
-                    
-                    Spacer().frame(height: 26)
-                    
-                    VStack(spacing: 26) {
-                        candidateHeader()
-                        candidateInfo()
-                        bottom()
+                if let candidate = viewModel.candidateDetail {
+                    VStack(spacing: 0) {
+                        header()
+                        candidateImage()
+                        Spacer().frame(height: 26)
+                        
+                        VStack(spacing: 26) {
+                            candidateHeader(candidate: candidate)
+                            candidateInfo(candidate: candidate)
+                            bottom(candidate: candidate)
+                        }
+                        .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
+                    .background(Color.gray060203)
+                } else {
+                    ProgressView()
+                        .tint(Color.blue4232D5)
                 }
-                .background(Color.gray060203)
             }
             .UPopUp(isPresented: $votingViewModel.popupSuccessFlag, content: {
                 UPopupView(
@@ -46,58 +58,75 @@ struct CandidateDetailView: View {
                         votingViewModel.popupSuccessFlag = false
                     }
             })
-            .UToast($votingViewModel.toastMessageFailFlag, .fail, votingViewModel.errorMessage)
+            .UToast($votingViewModel.detailToastFail, .fail, votingViewModel.errorMessage)
         }
         .onAppear {
+            viewModel.userID = userID
+            viewModel.candidateID = candidateID
             viewModel.action(.getCandidateDetailInfo)
             viewModel.action(.startTimer)
         }
+        .navigationBarBackButtonHidden()
+        .ignoresSafeArea(edges: .bottom)
         .onDisappear {
             viewModel.action(.stopTimer)
         }
-        .navigationBarBackButtonHidden()
-        .ignoresSafeArea(edges: .bottom)
-        
     }
 }
 
 extension CandidateDetailView {
     @ViewBuilder
-    private func bottom() -> some View {
+    private func header() -> some View {
+        UNavigation(
+            type: .LRBUttonTitle(
+                title: "2024 WMU",
+                leftImage: .icArrowLeft,
+                rightImage: .icCloseLine
+            )
+        )
+        .leftTap {
+            dismiss()
+            
+        }
+        .rightTap {
+            dismiss()
+        }
+    }
+    
+    @ViewBuilder
+    private func bottom(candidate: CandidateDetailEntity) -> some View {
         Text("COPYRIGHT © WUPSC ALL RIGHT RESERVED.")
             .utypograph(font: .light, size: 10, lineHeight: 16, color: .white)
             .padding(.vertical, 21.5)
         
-        
         UBottomButton(
-            title: (viewModel.candidateDetail?.voted ?? false) ? "Voted" : "Vote",
-            type: .large(viewModel.candidateDetail?.voted ?? false),
-            tapped: viewModel.candidateDetail?.voted ?? false,
+            title:candidate.voted ? "Voted" : "Vote",
+            type: .large(candidate.voted),
+            tapped: candidate.voted,
             image: .icnVoted
         )
         .tap {
-            votingViewModel.popupSuccessFlag = true
-            guard let candidate = viewModel.candidateDetail else { return }
-            votingViewModel.action(.postVote(candidateID: candidate.id))
+//            votingViewModel.action(.postVote(candidateID: candidate.id, type: .detail))
+//            viewModel.action(.getCandidateDetailInfo)
+            votingViewModel.action(.postVote(candidateID: candidate.id, type: .detail))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                viewModel.action(.getCandidateDetailInfo)
+            }
         }
         .padding(.init(top: 12, leading: 16, bottom: 24, trailing: 16))
     }
     
     @ViewBuilder
-    private func candidateInfo() -> some View {
+    private func candidateInfo(candidate: CandidateDetailEntity) -> some View {
         VStack(alignment: .leading) {
-            ForEach(0..<(viewModel.candidateDetail?.details.count ?? 0), id: \.self) { index in
-                if let detail = viewModel.candidateDetail?.details {
-                    VStack(spacing: 0) {
-                        ItemView(title: detail[index].title, desc: detail[index].content)
-                            .padding(.vertical, 12)
-                        Rectangle()
-                            .fill(Color.gray252525)
-                            .frame(height: 1)
-                            .opacity(index == detail.count - 1 ? 0 : 1)
-                    }
-                } else {
-                    EmptyView()
+            ForEach(0..<candidate.profileInfoList.count, id: \.self) { index in
+                VStack(spacing: 0) {
+                    ItemView(title: candidate.details[index].title, desc: candidate.details[index].content)
+                        .padding(.vertical, 12)
+                    Rectangle()
+                        .fill(Color.gray252525)
+                        .frame(height: 1)
+                        .opacity(index == candidate.details.count - 1 ? 0 : 1)
                 }
             }
             .padding(.init(top: 6, leading: 14, bottom: 6, trailing: 14))
@@ -107,13 +136,13 @@ extension CandidateDetailView {
     }
     
     @ViewBuilder
-    private func candidateHeader() -> some View {
+    private func candidateHeader(candidate: CandidateDetailEntity) -> some View {
         VStack(spacing: 6) {
-            Text(viewModel.candidateDetail?.name ?? "")
+            Text(candidate.name)
                 .utypograph(font: .meduim, size: 22, lineHeight: 26, color: Color.white)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            Text("Entry No.\(viewModel.candidateDetail?.candidateNumber ?? 0)")
+            Text("Entry No.\(candidate.candidateNumber)")
                 .utypograph(font: .meduim, size: 14, lineHeight: 20, color: .blue6F76FF)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -122,7 +151,6 @@ extension CandidateDetailView {
     @ViewBuilder
     private func ItemView(title: String, desc: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            // TODO: - font
             Text(title)
                 .utypograph(font: .bold, size: 14, lineHeight: 16, color: .gray7C7C7C)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -140,7 +168,7 @@ extension CandidateDetailView {
                     .resizable()
                     .scaledToFit()
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
-                    .tag(index) // index를 사용하여 currentProfileIndex와 동기화
+                    .tag(index)
             }
         }
         .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
@@ -187,3 +215,9 @@ extension CandidateDetailView {
         }
     }
 }
+
+
+/*
+ 
+
+ */
