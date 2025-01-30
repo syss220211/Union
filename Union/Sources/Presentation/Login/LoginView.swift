@@ -8,7 +8,8 @@
 import SwiftUI
 
 class LoginViewModel: ObservableObject {
-    @Published var text: String = ""
+    @Published var userID: String = ""
+    @Published var buttonToast: Bool = false
 }
 
 struct LoginView: View {
@@ -29,12 +30,17 @@ struct LoginView: View {
 
                     Spacer().frame(height: 32)
                     VStack(spacing: 24) {
-                        UTextField(text: $viewModel.text)
+                        UTextField(text: $viewModel.userID)
                         
                         UBottomButton(title: "Log in", type: .large(false))
                             .tap {
-                                print("go to candidateListView")
-                                router.navigateTo(.votingView)
+                                if viewModel.userID.isEmpty {
+                                    print("login Toast: \(viewModel.buttonToast)")
+                                    viewModel.buttonToast = true
+                                } else {
+                                    router.userID = viewModel.userID
+                                    router.navigateTo(.votingView(userID: viewModel.userID))
+                                }
                             }
                     }
                     .padding(.horizontal, 16)
@@ -43,12 +49,13 @@ struct LoginView: View {
                 
                 Spacer()
             }
-
+            
             Image(.earthBackground)
                 .resizable()
                 .scaledToFit()
         }
-        .ignoresSafeArea(edges: .bottom) // 전체 뷰에서 하단 안전 영역을 무시
+        .ignoresSafeArea(edges: .bottom)
+        .UToast($viewModel.buttonToast, .fail, "아이디를 입력해주세요")
     }
 }
 

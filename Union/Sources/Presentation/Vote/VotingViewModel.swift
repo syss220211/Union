@@ -20,11 +20,17 @@ class VotingViewModel: ObservableObject {
     @Published var toastMessageFailFlag: Bool = false
     @Published var toastMessageSuccessFlag: Bool = false
     @Published var tappedCandidateID: Int?
+    @Published var votedButtonFlag:Bool = false
     
+    public let userID: String
     private let usecase = VoteUsecase(voteRepoProtocol: VoteRepository())
     private var cancellables = Set<AnyCancellable>()
     private let candidateListSubject = PassthroughSubject<CandidateListEntity, Never>()
     private let votedCandidateListSubject = PassthroughSubject<VotedCandidateListEntity, Never>()
+    
+    init(userID: String) {
+        self.userID = userID
+    }
     
     enum Action {
         /// 후보자 목록 가져오기
@@ -38,7 +44,9 @@ class VotingViewModel: ObservableObject {
         /// 후보자 선택
         case tappedCandidate(candidateID: Int)
     }
-    
+}
+
+extension VotingViewModel {
     func action(_ action: Action) {
             switch action {
             case .getCandidateList:
@@ -61,7 +69,7 @@ class VotingViewModel: ObservableObject {
                     .store(in: &cancellables)
                 
             case .votedCandidateList:
-                let request: VoteType = .getVotedCandidateList(userID: "userA")
+                let request: VoteType = .getVotedCandidateList(userID: userID)
                 usecase.getVotedCadidateList(request: request)
                     .receive(on: DispatchQueue.main)
                     .sink { completion in
@@ -92,7 +100,7 @@ class VotingViewModel: ObservableObject {
                     .store(in: &cancellables)
                 
             case .postVote(let candidateID):
-                let voteRequest: VoteRequestDTO = VoteRequestDTO(userId: "userABddD", id: candidateID)
+                let voteRequest: VoteRequestDTO = VoteRequestDTO(userId: userID, id: candidateID)
                 let request: VoteType = .postVote(candidate: voteRequest)
                 usecase.postVote(request: request)
                     .receive(on: DispatchQueue.main)
@@ -101,17 +109,14 @@ class VotingViewModel: ObservableObject {
                         case .finished:
                             self.errorMessage = "투표가 완료되었습니다."
                             self.toastMessageSuccessFlag = true
-                            print("finised")
                             break
                         case .failure(let error):
                             switch error {
                             case .voteError(let statusCode, let data):
-                                print("statusCode \(statusCode)")
                                 self.errorMessage = StatusCode.message(forCode: statusCode) ?? "투표 중 에러가 발생하였습니다. 다시 시도해주세요."
                                 self.statusCode = statusCode
                                 self.postResult = data
                                 self.toastMessageFailFlag = true
-                                print("data \(data.errorCode)")
                             default:
                                 self.errorMessage = "투표 중 에러가 발생하였습니다. 다시 시도해주세요."
                             }
@@ -119,9 +124,9 @@ class VotingViewModel: ObservableObject {
                     } receiveValue: { [weak self] entity in
                         if entity.isEmpty {
                             self?.voteFlag = true
-                            print("투표에 성공하였습니다.")
+                        } else {
+                            self?.votedButtonFlag.toggle()
                         }
-                        print("entity.... \(entity)")
                     }
                     .store(in: &cancellables)
                 

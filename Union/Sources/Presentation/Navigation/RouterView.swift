@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct RouterView<Content: View>: View {
     @StateObject var router: Router = Router()
     private let content: Content
@@ -20,18 +22,69 @@ struct RouterView<Content: View>: View {
             VStack {
                 content
                 
+                // 각 화면별 NavigationLink를 개별적으로 관리
                 NavigationLink(
-                    isActive: $router.isActive,
-                    destination: {
-                        if let route = router.activeRoute {
-                            router.view(for: route)
-                                .environmentObject(router) // 새로운 뷰에도 router 전달
+                    destination: VotingView(viewModel: VotingViewModel(userID: router.userID ?? "")),
+                    isActive: Binding(
+                        get: { router.activeRoute == .votingView(userID: router.userID ?? "") },
+                        set: { newValue in
+                            if !newValue { router.activeRoute = nil }
                         }
-                    },
-                    label: { EmptyView() }
-                )
+                    )
+                ) { EmptyView() }
+
+                NavigationLink(
+                    destination: LoginView(),
+                    isActive: Binding(
+                        get: { router.activeRoute == .loginView },
+                        set: { newValue in
+                            if !newValue { router.activeRoute = nil }
+                        }
+                    )
+                ) { EmptyView() }
+                
+//                NavigationLink(
+//                    destination: CandidateDetailView(),
+//                    isActive: Binding(
+//                        get: { router.activeRoute == .candidateDetailView },
+//                        set: { newValue in
+//                            if !newValue { router.activeRoute = nil }
+//                        }
+//                    )
+//                ) { EmptyView() }
             }
-            .environmentObject(router) // content에 router 전달
+            .environmentObject(router)
         }
+    }
+}
+
+final class Router: ObservableObject {
+    enum Route: Hashable, Identifiable {
+        case loginView
+        case votingView(userID: String)
+        case candidateDetailView
+        
+        var id: Self { self }
+    }
+    
+    @Published var activeRoute: Route? = nil
+    var userID: String? = nil // 유저 ID를 저장
+
+    func navigateTo(_ page: Route) {
+        switch page {
+        case .votingView(let userID):
+            self.userID = userID
+        default:
+            break
+        }
+        activeRoute = page
+    }
+    
+    func navigateBack() {
+        activeRoute = nil
+    }
+    
+    func popToRoot() {
+        activeRoute = nil
     }
 }

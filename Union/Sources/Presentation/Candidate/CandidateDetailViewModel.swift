@@ -10,10 +10,12 @@ import SwiftUI
 
 class CandidateDetailViewModel: ObservableObject {
     @Published var timer = Timer.publish(every: 3.0, on: .main, in: .common).autoconnect()
-    @Published var cadidateDetail: CandidateDetailEntity?
+    @Published var candidateDetail: CandidateDetailEntity?
     @Published var imageList: [ProfileInfoListEntity] = []
     @Published var currentProfileIndex = 0
-    
+
+    let userID: String
+    let candidateID: Int
     private var cancellables = Set<AnyCancellable>()
     private let usecase = VoteUsecase(voteRepoProtocol: VoteRepository())
     
@@ -25,10 +27,18 @@ class CandidateDetailViewModel: ObservableObject {
         case stopTimer
     }
     
+    init(
+        userID: String,
+        candidateID: Int
+    ) {
+        self.userID = userID
+        self.candidateID = candidateID
+    }
+    
     func action(_ action: Action) {
         switch action {
         case .getCandidateDetailInfo:
-            let request: VoteType = .getCandidateDetailInfo(candidateID: 58, voterID: "123123123")
+            let request: VoteType = .getCandidateDetailInfo(candidateID: candidateID, voterID: userID)
             usecase.getCandidateDetailInfo(request: request)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
@@ -39,7 +49,7 @@ class CandidateDetailViewModel: ObservableObject {
                         print("error! \(error.localizedDescription)")
                     }
                 } receiveValue: { [weak self] entity in
-                    self?.cadidateDetail = entity
+                    self?.candidateDetail = entity
                     self?.imageList = entity.profileInfoList
                 }
                 .store(in: &cancellables)

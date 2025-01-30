@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct VotingView: View {
-    @StateObject var viewModel = VotingViewModel()
+    @ObservedObject var viewModel: VotingViewModel
     @StateObject private var timer = CountdownTimer()
+    
     var body: some View {
         ZStack {
             ScrollView {
@@ -156,8 +157,4 @@ struct BulletPointText: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
-}
-
-#Preview {
-    VotingView()
 }

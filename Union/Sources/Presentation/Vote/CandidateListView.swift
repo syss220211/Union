@@ -12,9 +12,10 @@ import Kingfisher
 struct CandidateListView: View {
     @ObservedObject var viewModel: VotingViewModel
     @EnvironmentObject var router: Router
+    
     /// 뷰를 그리기 위한 객체
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible()), count: 2)
-    private let size = (UIScreen.main.bounds.width - 10) / 2
+    private let size = (UIScreen.main.bounds.width - 48) / 2
     
     var body: some View {
         VStack(alignment: .leading, spacing: 40) {
@@ -23,17 +24,25 @@ struct CandidateListView: View {
             LazyVGrid(columns: columns, spacing: 40) {
                 ForEach(viewModel.candidateList?.content ?? [], id: \.id) { data in
                     VStack(spacing: 18) {
-                        RoundedRectangle(cornerRadius: 8)
-                            .frame(width: size, height: size)
-                            .overlay {
-                                KFImage(URL(string: data.profileUrl))
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: size, height: size)
-                            }
-                            .onTapGesture {
-                                router.navigateTo(.candidateDetailView)
-                            }
+                        NavigationLink {
+                            CandidateDetailView(
+                                votingViewModel: viewModel,
+                                viewModel: CandidateDetailViewModel(
+                                    userID: viewModel.userID,
+                                    candidateID: data.id
+                                )
+                            )
+                        } label: {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(.clear)
+                                .frame(width: size, height: size)
+                                .overlay {
+                                    KFImage(URL(string: data.profileUrl))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: size, height: size)
+                                }
+                        }
                         
                         VStack(spacing: 4){
                             Text(data.name)
@@ -50,6 +59,7 @@ struct CandidateListView: View {
                             )
                             .tap {
                                 viewModel.action(.postVote(candidateID: data.id))
+                                viewModel.votedButtonFlag.toggle()
                             }
                         }
                     }
@@ -58,6 +68,11 @@ struct CandidateListView: View {
             .padding(.horizontal, 19)
         }
         .onAppear {
+            viewModel.action(.getCandidateList)
+            viewModel.action(.votedCandidateList)
+            viewModel.action(.getVotedCandidateListUser)
+        }
+        .onChange(of: viewModel.votedButtonFlag) { _ in
             viewModel.action(.getCandidateList)
             viewModel.action(.votedCandidateList)
             viewModel.action(.getVotedCandidateListUser)

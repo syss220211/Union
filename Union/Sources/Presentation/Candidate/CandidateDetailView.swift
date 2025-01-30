@@ -10,8 +10,8 @@ import Combine
 import Kingfisher
 
 struct CandidateDetailView: View {
-    @StateObject var viewModel = CandidateDetailViewModel()
-    @StateObject var mainVM = VotingViewModel()
+    @ObservedObject var votingViewModel: VotingViewModel
+    @ObservedObject var viewModel: CandidateDetailViewModel
     
     var body: some View {
         ZStack {
@@ -38,19 +38,19 @@ struct CandidateDetailView: View {
                 }
                 .background(Color.gray060203)
             }
-            .UPopUp(isPresented: $mainVM.popupSuccessFlag, content: {
+            .UPopUp(isPresented: $votingViewModel.popupSuccessFlag, content: {
                 UPopupView(
                     title: "Voting Completed",
                     message: "Tank you for voting",
                     button: "Confirm") {
-                        mainVM.popupSuccessFlag = false
+                        votingViewModel.popupSuccessFlag = false
                     }
             })
-            .UToast($mainVM.toastMessageFailFlag, .fail, mainVM.errorMessage)
+            .UToast($votingViewModel.toastMessageFailFlag, .fail, votingViewModel.errorMessage)
         }
         .onAppear {
-            viewModel.action(.startTimer)
             viewModel.action(.getCandidateDetailInfo)
+            viewModel.action(.startTimer)
         }
         .onDisappear {
             viewModel.action(.stopTimer)
@@ -70,15 +70,15 @@ extension CandidateDetailView {
         
         
         UBottomButton(
-            title: (viewModel.cadidateDetail?.voted ?? false) ? "Voted" : "Vote",
-            type: .large(viewModel.cadidateDetail?.voted ?? false),
-            tapped: viewModel.cadidateDetail?.voted ?? false,
+            title: (viewModel.candidateDetail?.voted ?? false) ? "Voted" : "Vote",
+            type: .large(viewModel.candidateDetail?.voted ?? false),
+            tapped: viewModel.candidateDetail?.voted ?? false,
             image: .icnVoted
         )
         .tap {
-            mainVM.popupSuccessFlag = true
-//            guard let candidate = viewModel.cadidateDetail else { return }
-//            mainVM.action(.postVote(candidateID: candidate.id))
+            votingViewModel.popupSuccessFlag = true
+            guard let candidate = viewModel.candidateDetail else { return }
+            votingViewModel.action(.postVote(candidateID: candidate.id))
         }
         .padding(.init(top: 12, leading: 16, bottom: 24, trailing: 16))
     }
@@ -86,8 +86,8 @@ extension CandidateDetailView {
     @ViewBuilder
     private func candidateInfo() -> some View {
         VStack(alignment: .leading) {
-            ForEach(0..<(viewModel.cadidateDetail?.details.count ?? 0), id: \.self) { index in
-                if let detail = viewModel.cadidateDetail?.details {
+            ForEach(0..<(viewModel.candidateDetail?.details.count ?? 0), id: \.self) { index in
+                if let detail = viewModel.candidateDetail?.details {
                     VStack(spacing: 0) {
                         ItemView(title: detail[index].title, desc: detail[index].content)
                             .padding(.vertical, 12)
@@ -109,11 +109,11 @@ extension CandidateDetailView {
     @ViewBuilder
     private func candidateHeader() -> some View {
         VStack(spacing: 6) {
-            Text(viewModel.cadidateDetail?.name ?? "")
+            Text(viewModel.candidateDetail?.name ?? "")
                 .utypograph(font: .meduim, size: 22, lineHeight: 26, color: Color.white)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            Text("Entry No.\(viewModel.cadidateDetail?.candidateNumber ?? 0)")
+            Text("Entry No.\(viewModel.candidateDetail?.candidateNumber ?? 0)")
                 .utypograph(font: .meduim, size: 14, lineHeight: 20, color: .blue6F76FF)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -186,8 +186,4 @@ extension CandidateDetailView {
             }
         }
     }
-}
-
-#Preview {
-    CandidateDetailView()
 }
