@@ -36,9 +36,6 @@ struct VotingView: View {
                 .background(Color.gray060203)
                 .ignoresSafeArea(edges: .bottom)
             }
-            .onChange(of: viewModel.errorMessage) { _ in
-                viewModel.votingToastFail = true
-            }
             .UToast($viewModel.votingToastFail, .fail, viewModel.errorMessage)
             .UToast($viewModel.votingToastSuccess, .success, viewModel.errorMessage)
             .ignoresSafeArea(edges: .bottom)

@@ -57,9 +57,11 @@ struct CandidateListView: View {
                                     type: .medium(data.voted)
                                 )
                                 .tap {
-                                    guard let _ = viewModel.candidateList else { return }
-                                    viewModel.votedButtonFlag.toggle()
                                     viewModel.action(.postVote(candidateID: data.id, type: .main))
+                                    viewModel.page = 1
+                                    viewModel.action(.getCandidateList)
+                                    viewModel.action(.votedCandidateList)
+                                    viewModel.action(.getVotedCandidateListUser)
                                 }
                             }
                         }
@@ -84,11 +86,6 @@ struct CandidateListView: View {
                 
             }
             .padding(.horizontal, 19)
-        }
-        .onChange(of: viewModel.votedButtonFlag) { _ in
-            viewModel.action(.getCandidateList)
-            viewModel.action(.votedCandidateList)
-            viewModel.action(.getVotedCandidateListUser)
         }
     }
     

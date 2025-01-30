@@ -23,7 +23,6 @@ class VotingViewModel: ObservableObject {
     @Published var votingToastFail: Bool = false
     @Published var votingToastSuccess: Bool = false
     @Published var tappedCandidateID: Int?
-    @Published var votedButtonFlag:Bool = false
     
     // MARK: - DetailFlag
     @Published var detailToastFail: Bool = false
@@ -79,16 +78,25 @@ extension VotingViewModel {
                             self.isLoading = false
                         }
                     } receiveValue: { [weak self] entity in
+                        // 리스트가 비어있는지 확인
                         if entity.content.isEmpty {
                             self?.hasMoreProducts = false
                         } else if self?.page == 1 {
+                            // 첫 페이지일 경우, 새로운 리스트를 설정
                             self?.candidateList = entity
                             self?.page += 1
                         } else {
+                            // 추가 페이지일 경우, 기존 리스트에 데이터를 추가
                             self?.candidateList?.content.append(contentsOf: entity.content)
                             self?.page += 1
                         }
-
+                        
+                        // candidateList가 업데이트된 후에 subject에 발행
+                        if let updatedList = self?.candidateList {
+                            self?.candidateListSubject.send(updatedList)
+                        }
+                        
+                        // 로딩 상태를 false로 설정
                         self?.isLoading = false
                     }
                     .store(in: &cancellables)
@@ -133,8 +141,8 @@ extension VotingViewModel {
                     .sink { completion in
                         switch completion {
                         case .finished:
-                            type == .main ? (self.votingToastSuccess = true) : (self.popupSuccessFlag = true)
                             self.errorMessage = "투표가 완료되었습니다."
+                            type == .main ? (self.votingToastSuccess = true) : (self.popupSuccessFlag = true)
                             break
                         case .failure(let error):
                             switch error {
@@ -147,6 +155,7 @@ extension VotingViewModel {
                             }
                         }
                     } receiveValue: { [weak self] entity in
+                        self?.errorMessage = "투표가 완료되었습니다."
                         self?.votedButtonFlag.toggle()
                     }
                     .store(in: &cancellables)
