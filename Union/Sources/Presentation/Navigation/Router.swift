@@ -7,47 +7,33 @@
 
 import SwiftUI
 
-//final class Router: ObservableObject {
-//    enum Route: Hashable, Identifiable {
-//        var id: Self { self }
-//        
-//        case loginView
-//        case votingView(userID: String)
-//        case candidateDetailView
-//    }
-//    
-//    @Published var activeRoute: Route?
-//    @Published var isActive: Bool = false
-//    
-//    @ViewBuilder func view(for route: Route) -> some View {
-//        switch route {
-//        case .loginView:
-//            LoginView()
-//        case .votingView(let userID):
-//            VotingView(userID: userID)
-//        case .candidateDetailView:
-//            CandidateDetailView()
-//        }
-//    }
-//    
-//    func navigateTo(_ page: Route) {
-//        activeRoute = page
-//        isActive = true
-//    }
-//    
-//    func navigateBack() {
-//        isActive = false
-//        activeRoute = nil
-//    }
-//    
-//    func popToRoot() {
-//        isActive = false
-//        activeRoute = nil
-//    }
-//    
-//    func replaceNavigationStack(_ page: Route) {
-//        activeRoute = page
-//        isActive = true
-//    }
-//}
-//
+/// 앱의 화면 경로(Route)를 정의하는 Enum
+enum Route: Hashable, Identifiable {
+    case loginView
+    case votingView(userID: String)
+
+    var id: Self { self }
+}
+
+/// 화면 이동을 관리하는 Router (ObservableObject)
+final class Router: ObservableObject {
+    @Published var navigationStack: [Route] = []
+    @Published var userID: String = ""
+    static let shared = Router()  // 싱글턴 패턴으로 전역에서 접근 가능
+
+    /// 특정 화면으로 이동
+    func navigateTo(_ page: Route) {
+        navigationStack.append(page)
+    }
+
+    /// 뒤로 가기
+    func navigateBack() {
+        guard !navigationStack.isEmpty else { return }
+        navigationStack.removeLast()
+    }
+
+    /// 루트로 이동 (초기 화면으로 이동)
+    func popToRoot() {
+        navigationStack.removeAll()
+    }
+}

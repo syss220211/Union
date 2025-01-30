@@ -8,7 +8,6 @@
 import SwiftUI
 import Combine
 
-// ViewModel
 class CountdownTimer: ObservableObject {
     @Published private(set) var timeComponents: (days: Int, hours: Int, minutes: Int, seconds: Int) = (0, 0, 0, 0)
     

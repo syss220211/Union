@@ -7,39 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
-/// 앱의 화면 경로(Route)를 정의하는 Enum
-enum Route: Hashable, Identifiable {
-    case loginView
-    case votingView(userID: String)
-
-    var id: Self { self }
-}
-
-/// 화면 이동을 관리하는 Router (ObservableObject)
-final class Router: ObservableObject {
-    @Published var navigationStack: [Route] = []
-    @Published var userID: String = ""
-    static let shared = Router()  // 싱글턴 패턴으로 전역에서 접근 가능
-
-    /// 특정 화면으로 이동
-    func navigateTo(_ page: Route) {
-        navigationStack.append(page)
-    }
-
-    /// 뒤로 가기
-    func navigateBack() {
-        guard !navigationStack.isEmpty else { return }
-        navigationStack.removeLast()
-    }
-
-    /// 루트로 이동 (초기 화면으로 이동)
-    func popToRoot() {
-        navigationStack.removeAll()
-    }
-}
-
 /// `Router`를 활용한 네비게이션 관리 뷰
 struct RouterView<Content: View>: View {
     @StateObject private var router = Router.shared
@@ -52,7 +19,7 @@ struct RouterView<Content: View>: View {
     var body: some View {
         NavigationView {
             VStack {
-                content  // 메인 콘텐츠
+                content
 
                 // NavigationLink들을 동적으로 생성하여 화면 전환 관리
                 ForEach(router.navigationStack.indices, id: \.self) { index in
@@ -90,74 +57,3 @@ struct RouterView<Content: View>: View {
         }
     }
 }
-
-
-//struct RouterView<Content: View>: View {
-//    @StateObject var router: Router = Router()
-//    private let content: Content
-//    
-//    init(@ViewBuilder content: @escaping () -> Content) {
-//        self.content = content()
-//    }
-//    
-//    var body: some View {
-//        NavigationView {
-//            VStack {
-//                content
-//                
-//                // 각 화면별 NavigationLink를 개별적으로 관리
-//                NavigationLink(
-//                    destination: VotingView(viewModel: VotingViewModel(userID: router.userID ?? "")),
-//                    isActive: Binding(
-//                        get: { router.activeRoute == .votingView(userID: router.userID ?? "") },
-//                        set: { newValue in
-//                            if !newValue { router.activeRoute = nil }
-//                        }
-//                    )
-//                ) { EmptyView() }
-//
-//                NavigationLink(
-//                    destination: LoginView(),
-//                    isActive: Binding(
-//                        get: { router.activeRoute == .loginView },
-//                        set: { newValue in
-//                            if !newValue { router.activeRoute = nil }
-//                        }
-//                    )
-//                ) { EmptyView() }
-//            }
-//            .environmentObject(router)
-//        }
-//    }
-//}
-//
-//final class Router: ObservableObject {
-//    enum Route: Hashable, Identifiable {
-//        case loginView
-//        case votingView(userID: String)
-//        case candidateDetailView
-//        
-//        var id: Self { self }
-//    }
-//    
-//    @Published var activeRoute: Route? = nil
-//    var userID: String? = nil // 유저 ID를 저장
-//
-//    func navigateTo(_ page: Route) {
-//        switch page {
-//        case .votingView(let userID):
-//            self.userID = userID
-//        default:
-//            break
-//        }
-//        activeRoute = page
-//    }
-//    
-//    func navigateBack() {
-//        activeRoute = nil
-//    }
-//    
-//    func popToRoot() {
-//        activeRoute = nil
-//    }
-//}

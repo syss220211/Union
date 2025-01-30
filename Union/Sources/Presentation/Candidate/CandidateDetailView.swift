@@ -106,8 +106,6 @@ extension CandidateDetailView {
             image: .icnVoted
         )
         .tap {
-//            votingViewModel.action(.postVote(candidateID: candidate.id, type: .detail))
-//            viewModel.action(.getCandidateDetailInfo)
             votingViewModel.action(.postVote(candidateID: candidate.id, type: .detail))
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 viewModel.action(.getCandidateDetailInfo)

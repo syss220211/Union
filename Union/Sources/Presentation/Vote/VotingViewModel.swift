@@ -54,8 +54,6 @@ class VotingViewModel: ObservableObject {
         case getVotedCandidateListUser
         /// 투표하기
         case postVote(candidateID: Int, type: VotingPlace)
-        /// 후보자 선택
-        case tappedCandidate(candidateID: Int)
     }
 }
 
@@ -152,9 +150,6 @@ extension VotingViewModel {
                         self?.votedButtonFlag.toggle()
                     }
                     .store(in: &cancellables)
-                
-            case .tappedCandidate(let candidateID):
-                self.tappedCandidateID = candidateID
             }
         }
 }
